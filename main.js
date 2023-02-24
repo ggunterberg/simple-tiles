@@ -1,4 +1,12 @@
 function SimpleTiles(parent){
+	// Setup canvas and rendering context
+	this.canvas = document.createElement('canvas');
+	this.canvas.width = 150;
+	this.canvas.height = 150;
+	this.ctx = this.canvas.getContext("2d");
+	console.debug('ctx created with sucess');
+	parent.appendChild(this.canvas);
+
 	// Game logic and animation should run separetly
 
 	// Setup tick loop
