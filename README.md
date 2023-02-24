@@ -12,7 +12,7 @@ A simple press-the-tiles-like game made with js.
 
 ## todo
 
-- [ ] Game rendering/logic cycle
+- [x] Game rendering/logic cycle
 - [ ] Render input-tiles
 - [ ] Render sample tiles
 - [ ] Generate tiles randomly
