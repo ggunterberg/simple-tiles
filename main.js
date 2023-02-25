@@ -38,7 +38,7 @@ SimpleTiles.prototype.tick = function(){
 	const deltaTime = performance.now() - this.lastTick;
 
 	// Actual game logic
-	console.log(`game loop, deltaTime: ${deltaTime}, gameLoop: ${this.gameLoop}`);
+	console.debug(`game loop, deltaTime: ${deltaTime}, gameLoop: ${this.gameLoop}`);
 
 	// Recapture performance.now() so we don't consider the time it took to execute game loop
 	this.lastTick = performance.now();
@@ -48,12 +48,12 @@ SimpleTiles.prototype.tick = function(){
 SimpleTiles.prototype.draw = function(timestamp){
 	// Do not render if there is no update
 	if (this.gameLoop <= this.renderLoop) {
-		console.warn('render skipped');
+		console.debug('render skipped');
 		return;
 	}
 
 	// Actual rendering
-	console.log('render');
+	console.debug('render');
 
 	// Updates last rendered loop
 	this.renderLoop = this.gameLoop;
