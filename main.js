@@ -55,6 +55,38 @@ SimpleTiles.prototype.draw = function(timestamp){
 	// Actual rendering
 	console.debug('render');
 
+	// Rendering setup 
+	const keyTiles = [
+		{ key: 'a', color: '#f00' },
+		{ key: 's', color: '#0f0' },
+		{ key: 'd', color: '#00f' },
+		{ key: 'f', color: '#ff0' },
+	];
+	const tileWidth = this.canvas.width / keyTiles.length;
+	const canvasHeight = this.canvas.height;
+
+	// Render keyTiles
+	let xOffset = 0;
+	const keyTileHeight = 40;
+	for (const keyTile of keyTiles) {
+
+		const drawHeight = canvasHeight - keyTileHeight;
+		this.ctx.fillStyle = keyTile.color;
+		this.ctx.fillRect(xOffset, drawHeight, tileWidth, keyTileHeight);
+
+		// Render keys
+		const key = keyTile.key.toUpperCase();
+		this.ctx.font = '12px Verdana';
+		this.ctx.textBaseline = 'middle';
+		const keySize = this.ctx.measureText(key);
+		this.ctx.fillStyle = '#fff';
+		this.ctx.fillText(key,
+			(xOffset + (tileWidth / 2)) - (keySize.width / 2),
+			(drawHeight + (keyTileHeight / 2)));
+
+		xOffset += tileWidth;
+	}
+
 	// Updates last rendered loop
 	this.renderLoop = this.gameLoop;
 }
