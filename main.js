@@ -7,8 +7,17 @@ function SimpleTiles(parent){
 	console.debug('ctx created with sucess');
 	parent.appendChild(this.canvas);
 
-	// Game logic and animation should run separetly
+	// Temporary setup
+	this.tileLines = [
+		{ key: 'a', color: '#f00', tiles: [ { pos: 0 } ] },
+		{ key: 's', color: '#0f0', tiles: [ { pos: 40 } ] },
+		{ key: 'd', color: '#00f', tiles: [ { pos: 60 } ] },
+		{ key: 'f', color: '#ff0', tiles: [ { pos: 90 } ] }
+	];
+	this.tileHeight = 40;
+	this.tileWidth = this.canvas.width / this.tileLines.length;
 
+	// Game logic and animation should run separetly
 	// Setup tick loop
 	const fps = 1000 / 45;	// 30 is the desired fps, setInterval will cause 15ms 
 	this.gameLoop = 0;
@@ -55,36 +64,33 @@ SimpleTiles.prototype.draw = function(timestamp){
 	// Actual rendering
 	console.debug('render');
 
-	// Rendering setup 
-	const keyTiles = [
-		{ key: 'a', color: '#f00' },
-		{ key: 's', color: '#0f0' },
-		{ key: 'd', color: '#00f' },
-		{ key: 'f', color: '#ff0' },
-	];
-	const tileWidth = this.canvas.width / keyTiles.length;
-	const canvasHeight = this.canvas.height;
-
 	// Render keyTiles
 	let xOffset = 0;
-	const keyTileHeight = 40;
-	for (const keyTile of keyTiles) {
+	for (const tileLine of this.tileLines) {
 
-		const drawHeight = canvasHeight - keyTileHeight;
-		this.ctx.fillStyle = keyTile.color;
-		this.ctx.fillRect(xOffset, drawHeight, tileWidth, keyTileHeight);
+		this.ctx.fillStyle = tileLine.color;
+
+		// Render tiles
+		for (const tile of tileLine.tiles) {
+			// Assumes color is correct
+			this.ctx.fillRect(xOffset + 2, tile.pos, this.tileWidth - 4, this.tileHeight - 4);
+		}
+
+		// Render keyTile
+		const drawHeight = this.canvas.height - this.tileHeight;
+		this.ctx.fillRect(xOffset, drawHeight, this.tileWidth, this.tileHeight);
 
 		// Render keys
-		const key = keyTile.key.toUpperCase();
+		const key = tileLine.key.toUpperCase();
 		this.ctx.font = '12px Verdana';
 		this.ctx.textBaseline = 'middle';
 		const keySize = this.ctx.measureText(key);
 		this.ctx.fillStyle = '#fff';
 		this.ctx.fillText(key,
-			(xOffset + (tileWidth / 2)) - (keySize.width / 2),
-			(drawHeight + (keyTileHeight / 2)));
+			(xOffset + (this.tileWidth / 2)) - (keySize.width / 2),
+			(drawHeight + (this.tileHeight / 2)));
 
-		xOffset += tileWidth;
+		xOffset += this.tileWidth;
 	}
 
 	// Updates last rendered loop
