@@ -16,6 +16,7 @@ function SimpleTiles(parent){
 	];
 	this.tileHeight = 40;
 	this.tileWidth = this.canvas.width / this.tileLines.length;
+	this.tileVelocity = 150;
 
 	// Game logic and animation should run separetly
 	// Setup tick loop
@@ -44,10 +45,16 @@ SimpleTiles.prototype.tick = function(){
 
 	// The actual interval of calling the function is never going to be precise
 	// So we calculate the time difference between now and the last execution
-	const deltaTime = performance.now() - this.lastTick;
+	const deltaTime = (performance.now() - this.lastTick) / 1000;
 
 	// Actual game logic
 	console.debug(`game loop, deltaTime: ${deltaTime}, gameLoop: ${this.gameLoop}`);
+	for (const tileLine of this.tileLines) {
+		tileLine.tiles = tileLine.tiles.filter(t => t.pos < this.canvas.height);
+		for (const tile of tileLine.tiles) {
+			tile.pos += deltaTime * this.tileVelocity;
+		}
+	}
 
 	// Recapture performance.now() so we don't consider the time it took to execute game loop
 	this.lastTick = performance.now();
@@ -63,6 +70,7 @@ SimpleTiles.prototype.draw = function(timestamp){
 
 	// Actual rendering
 	console.debug('render');
+	this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
 	// Render keyTiles
 	let xOffset = 0;
