@@ -20,6 +20,7 @@ A simple press-the-tiles-like game made with js.
 - [x] Generate tiles randomly
 - [x] Capture user input, highlight input-tiles accordingly
 - [ ] Remove tiles when input-tiles pressed
+- [ ] Score system
 - [ ] Fancy effects
 
 ## extra
