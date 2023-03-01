@@ -1,22 +1,23 @@
 function SimpleTiles(parent){
 	// Setup canvas and rendering context
 	this.canvas = document.createElement('canvas');
-	this.canvas.width = 150;
-	this.canvas.height = 150;
+	this.canvas.width = 160;
+	this.canvas.height = 160;
 	this.ctx = this.canvas.getContext("2d");
 	console.debug('ctx created with sucess');
 	parent.appendChild(this.canvas);
 
-	// Temporary setup
+	// Game setup
+	this.lastTile = { pos: -160 };
 	this.tileLines = [
-		{ key: 'a', color: '#f00', tiles: [ { pos: 0 } ] },
-		{ key: 's', color: '#0f0', tiles: [ { pos: 40 } ] },
-		{ key: 'd', color: '#00f', tiles: [ { pos: 60 } ] },
-		{ key: 'f', color: '#ff0', tiles: [ { pos: 90 } ] }
+		{ key: 'a', color: '#f00', tiles: [ { pos: -40 } ] },
+		{ key: 's', color: '#0f0', tiles: [ { pos: -80 } ] },
+		{ key: 'd', color: '#00f', tiles: [ { pos: -120 } ] },
+		{ key: 'f', color: '#ff0', tiles: [ this.lastTile ] }
 	];
 	this.tileHeight = 40;
 	this.tileWidth = this.canvas.width / this.tileLines.length;
-	this.tileVelocity = 150;
+	this.tileVelocity = 160;
 
 	// Game logic and animation should run separetly
 	// Setup tick loop
@@ -49,9 +50,26 @@ SimpleTiles.prototype.tick = function(){
 
 	// Actual game logic
 	console.debug(`game loop, deltaTime: ${deltaTime}, gameLoop: ${this.gameLoop}`);
-	for (const tileLine of this.tileLines) {
-		tileLine.tiles = tileLine.tiles.filter(t => t.pos < this.canvas.height);
-		for (const tile of tileLine.tiles) {
+
+	// Iterating each tile in each tileLine
+	for (let tli = this.tileLines.length - 1; tli >= 0; tli--) {
+		const tileLine = this.tileLines[tli];
+
+		for (let ti = tileLine.tiles.length - 1; ti >= 0; ti--) {
+			const tile = tileLine.tiles[ti];
+
+			if (tile.pos + this.tileHeight >= this.canvas.height) {
+				// Remove tile if position is lower than the canvas
+				tileLine.tiles.splice(ti, 1);
+
+				// Add another tile just above the last positioned tile on a random tileLine
+				// this shuld guarantee (if game state is maintained correctly) that only one tile is to pressed at a time, at a fixed time rate,
+				// thus making the game difficulty almost constant
+				const spawnTileLine = this.tileLines[Math.floor(Math.random() * this.tileLines.length)];
+				const newTile = { pos: this.lastTile.pos - 40 };
+				spawnTileLine.tiles.push(newTile);
+				this.lastTile = newTile;
+			}
 			tile.pos += deltaTime * this.tileVelocity;
 		}
 	}
