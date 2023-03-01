@@ -17,7 +17,7 @@ A simple press-the-tiles-like game made with js.
 - [x] Render input-tiles
 - [x] Render sample tiles
 - [x] Move and remove tiles
-- [ ] Generate tiles randomly
+- [x] Generate tiles randomly
 - [ ] Capture user input
 - [ ] Fancy effects
 
