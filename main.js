@@ -10,14 +10,30 @@ function SimpleTiles(parent){
 	// Game setup
 	this.lastTile = { pos: -160 };
 	this.tileLines = [
-		{ key: 'a', color: '#f00', tiles: [ { pos: -40 } ] },
-		{ key: 's', color: '#0f0', tiles: [ { pos: -80 } ] },
-		{ key: 'd', color: '#00f', tiles: [ { pos: -120 } ] },
-		{ key: 'f', color: '#ff0', tiles: [ this.lastTile ] }
+		{ isPressed: false, key: 'a', color: '#f00', tiles: [ { pos: -40 } ] },
+		{ isPressed: false, key: 's', color: '#0f0', tiles: [ { pos: -80 } ] },
+		{ isPressed: false, key: 'd', color: '#00f', tiles: [ { pos: -120 } ] },
+		{ isPressed: false, key: 'f', color: '#ff0', tiles: [ this.lastTile ] }
 	];
+	this.tileLineHighlightColor = '#000';
 	this.tileHeight = 40;
 	this.tileWidth = this.canvas.width / this.tileLines.length;
 	this.tileVelocity = 160;
+
+	// Game input system, simply update isPressed on each tileLine
+	const findByKey = (key) => {
+		return this.tileLines.find(tileLine => tileLine.key.toUpperCase().charCodeAt(0) == key);	
+	};
+	window.addEventListener('keydown', (e) => { 
+		const t = findByKey(e.keyCode);
+		if (t) t.isPressed = true;
+		console.debug(`pressed ${t.key} tile line`);
+	});
+	window.addEventListener('keyup', (e) => { 
+		const t = findByKey(e.keyCode);
+		if (t) t.isPressed = false;
+		console.debug(`unpressed ${t.key} tile line`);
+	});
 
 	// Game logic and animation should run separetly
 	// Setup tick loop
@@ -103,6 +119,7 @@ SimpleTiles.prototype.draw = function(timestamp){
 		}
 
 		// Render keyTile
+		if (tileLine.isPressed) this.ctx.fillStyle = this.tileLineHighlightColor;
 		const drawHeight = this.canvas.height - this.tileHeight;
 		this.ctx.fillRect(xOffset, drawHeight, this.tileWidth, this.tileHeight);
 
