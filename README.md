@@ -19,7 +19,7 @@ A simple press-the-tiles-like game made with js.
 - [x] Move and remove tiles
 - [x] Generate tiles randomly
 - [x] Capture user input, highlight input-tiles accordingly
-- [ ] Remove tiles when input-tiles pressed
+- [x] Remove tiles when input-tiles pressed
 - [ ] Score system
 - [ ] Fancy effects
 
