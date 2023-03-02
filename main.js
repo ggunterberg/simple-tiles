@@ -15,25 +15,28 @@ function SimpleTiles(parent){
 		{ isPressed: false, key: 'd', color: '#00f', tiles: [ { pos: -120 } ] },
 		{ isPressed: false, key: 'f', color: '#ff0', tiles: [ this.lastTile ] }
 	];
+	this.commandsMapping = {
+		KeyA: this.tileLines[0],
+		KeyS: this.tileLines[1],
+		KeyD: this.tileLines[2],
+		KeyF: this.tileLines[3]
+	};
 	this.tileLineHighlightColor = '#000';
 	this.tileHeight = 40;
 	this.tileWidth = this.canvas.width / this.tileLines.length;
 	this.tileVelocity = 160;
 
-	// Game input system, simply update isPressed on each tileLine
-	const findByKey = (key) => {
-		return this.tileLines.find(tileLine => tileLine.key.toUpperCase().charCodeAt(0) == key);	
+	// There should be no game logic in input capturing system
+	const inputEventHandler = (event) => {
+		let t = this.commandsMapping[event.code];
+		if (event.type === 'keydown' && event.repeat) return;
+		if (t) {
+			console.debug(`dispatch command event, type: ${event.type}, tileLine key: ${t.key}`);
+			this.commandHandler({ event: event.type, tileLine: t });	
+		} 
 	};
-	window.addEventListener('keydown', (e) => { 
-		const t = findByKey(e.keyCode);
-		if (t) t.isPressed = true;
-		console.debug(`pressed ${t.key} tile line`);
-	});
-	window.addEventListener('keyup', (e) => { 
-		const t = findByKey(e.keyCode);
-		if (t) t.isPressed = false;
-		console.debug(`unpressed ${t.key} tile line`);
-	});
+	window.addEventListener('keydown', inputEventHandler);
+	window.addEventListener('keyup', inputEventHandler);
 
 	// Game logic and animation should run separetly
 	// Setup tick loop
@@ -50,6 +53,21 @@ function SimpleTiles(parent){
 		requestAnimationFrame(drawLoop);
 	};
 	requestAnimationFrame(drawLoop);
+}
+
+// Game input system, simply update game state isPressed based on tileLine and event Type 
+SimpleTiles.prototype.commandHandler = function({ event, tileLine }){
+	switch (event) {
+		case 'keydown':
+			tileLine.isPressed = true;
+			const tile = tileLine.tiles[0];
+			if (tile && tile.pos + this.tileHeight >= this.canvas.height - this.tileHeight)
+				this.removeTile(tileLine);
+			break;
+		case 'keyup':
+			tileLine.isPressed = false;
+			break;
+	}
 }
 
 SimpleTiles.prototype.tick = function(){
