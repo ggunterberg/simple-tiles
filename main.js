@@ -66,33 +66,43 @@ SimpleTiles.prototype.tick = function(){
 
 	// Actual game logic
 	console.debug(`game loop, deltaTime: ${deltaTime}, gameLoop: ${this.gameLoop}`);
-
-	// Iterating each tile in each tileLine
-	for (let tli = this.tileLines.length - 1; tli >= 0; tli--) {
-		const tileLine = this.tileLines[tli];
-
-		for (let ti = tileLine.tiles.length - 1; ti >= 0; ti--) {
-			const tile = tileLine.tiles[ti];
-
-			if (tile.pos + this.tileHeight >= this.canvas.height) {
-				// Remove tile if position is lower than the canvas
-				tileLine.tiles.splice(ti, 1);
-
-				// Add another tile just above the last positioned tile on a random tileLine
-				// this shuld guarantee (if game state is maintained correctly) that only one tile is to pressed at a time, at a fixed time rate,
-				// thus making the game difficulty almost constant
-				const spawnTileLine = this.tileLines[Math.floor(Math.random() * this.tileLines.length)];
-				const newTile = { pos: this.lastTile.pos - 40 };
-				spawnTileLine.tiles.push(newTile);
-				this.lastTile = newTile;
-			}
+	for (const tileLine of this.tileLines) {
+		// Updates tiles positions
+		for (const tile of tileLine.tiles) {
 			tile.pos += deltaTime * this.tileVelocity;
+		}
+
+		// Remove tile if position is lower than the canvas
+		// Assumes first tile is always the next to check
+		const tile = tileLine.tiles[0];
+		if (tile && tile.pos + this.tileHeight >= this.canvas.height) {
+			this.removeTile(tileLine);
 		}
 	}
 
 	// Recapture performance.now() so we don't consider the time it took to execute game loop
 	this.lastTick = performance.now();
 	this.gameLoop++;
+}
+
+SimpleTiles.prototype.removeTile = function(tileLine){
+	tileLine.tiles.shift();
+	// Adding another tile when we delete one makes game difficulty more constant
+	this.addTile();
+}
+
+SimpleTiles.prototype.addTile = function(tileLine){
+	// Chooses randomly if not specified
+	const spawnTileLine = tileLine ?? this.tileLines[Math.floor(Math.random() * this.tileLines.length)];
+
+	// Check if its on time to add to grid, if not then simply add
+	const nextGridPos = this.lastTile.pos - this.tileHeight;
+	const pos = nextGridPos > this.tileHeight / 2 ? -this.tileHeight : nextGridPos;
+	const newTile = { pos };
+
+	// Adds to tiles list and updates lastTile
+	spawnTileLine.tiles.push(newTile);
+	this.lastTile = newTile;
 }
 
 SimpleTiles.prototype.draw = function(timestamp){
