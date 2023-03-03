@@ -8,6 +8,9 @@ function SimpleTiles(parent){
 	parent.appendChild(this.canvas);
 
 	// Game setup
+	this.score = 0;
+	this.scoreSequence = 0;
+	this.combo = 1;
 	this.lastTile = { pos: -160 };
 	this.tileLines = [
 		{ isPressed: false, key: 'a', color: '#f00', tiles: [ { pos: -40 } ] },
@@ -61,8 +64,12 @@ SimpleTiles.prototype.commandHandler = function({ event, tileLine }){
 		case 'keydown':
 			tileLine.isPressed = true;
 			const tile = tileLine.tiles[0];
-			if (tile && tile.pos + this.tileHeight >= this.canvas.height - this.tileHeight)
+			if (tile && tile.pos + this.tileHeight >= this.canvas.height - this.tileHeight){
 				this.removeTile(tileLine);
+				this.modifyScore(1);
+			} else {
+				this.modifyScore(-1);
+			}
 			break;
 		case 'keyup':
 			tileLine.isPressed = false;
@@ -95,6 +102,7 @@ SimpleTiles.prototype.tick = function(){
 		const tile = tileLine.tiles[0];
 		if (tile && tile.pos + this.tileHeight >= this.canvas.height) {
 			this.removeTile(tileLine);
+			this.modifyScore(-1);
 		}
 	}
 
@@ -107,6 +115,19 @@ SimpleTiles.prototype.removeTile = function(tileLine){
 	tileLine.tiles.shift();
 	// Adding another tile when we delete one makes game difficulty more constant
 	this.addTile();
+}
+
+SimpleTiles.prototype.modifyScore = function(scoreAdd){
+	console.debug(`modifying score by: ${scoreAdd}`);
+	this.scoreSequence += Math.max(0, scoreAdd);
+
+	if (scoreAdd < 0) {
+		this.score += this.scoreSequence * this.combo;
+		this.combo = 1;
+		this.scoreSequence = 0;
+	} else {
+		this.combo = Math.max(1, Math.floor((this.scoreSequence + 25) / 25));
+	} 
 }
 
 SimpleTiles.prototype.addTile = function(tileLine){
@@ -163,6 +184,9 @@ SimpleTiles.prototype.draw = function(timestamp){
 
 		xOffset += this.tileWidth;
 	}
+
+	this.ctx.fillStyle = '#000';
+	this.ctx.fillText(`${this.score} + ${this.scoreSequence} ${this.combo > 1 ? `x${this.combo}` : ''}`, this.canvas.width / 2, 20);
 
 	// Updates last rendered loop
 	this.renderLoop = this.gameLoop;
