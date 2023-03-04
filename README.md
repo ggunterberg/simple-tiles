@@ -26,7 +26,7 @@ A simple press-the-tiles-like game made with js.
 ## extra
 
 - [ ] Verify possible build tools that could help on polyfill and minification
-- [ ] Publish with github pages or any other workflow
+- [x] Publish with github pages or any other workflow (https://ggunterberg.github.io/simple-tiles/)
 - [ ] Verify any possible automation tool to help on code quality and code testing (are they suitable for such small project?)
 - [ ] Documentation on how to build and deploy and stats on performance
 
